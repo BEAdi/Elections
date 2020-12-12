@@ -228,14 +228,6 @@ def deal_with_row(fac, deg, dept1, dept2):
         add_stud_dept(deg, dept2, 0.5)
 
 
-#
-# def add_stud_deg(deg, dept1, num):
-#     try:
-#         departments_with_studs[deg][dept1] += num
-#     except KeyError:
-#         departments_with_studs[deg][dept1] = num
-
-
 def add_stud_dept(deg, dept1, num):
     if dept1 in givat_ram_not_masters and deg not in not_masters:
         dept1 = MASTERS_GIVAT_RAM
@@ -243,27 +235,6 @@ def add_stud_dept(deg, dept1, num):
         departments_with_studs[dept1] += num
     except KeyError:
         departments_with_studs[dept1] = num
-
-
-#
-# def write_results_deg():
-#     workbook = xlsxwriter.Workbook('Elections2.xlsx')
-#     worksheet = workbook.add_worksheet("Results")
-#
-#     worksheet.write(0, 0, 'תואר')
-#     worksheet.write(0, 1, 'חוג')
-#     worksheet.write(0, 2, 'מספר סטודנטים')
-#
-#     row = 1
-#     col = 0
-#
-#     for elem in departments_with_studs:
-#         for elem2 in departments_with_studs[elem]:
-#             worksheet.write(row, col, Degrees[elem])  # degree
-#             worksheet.write(row, col + 1, Departments[elem2])  # department
-#             worksheet.write(row, col + 2, departments_with_studs[elem][elem2])  # num of studs
-#             row += 1
-#     workbook.close()
 
 
 def write_results_dept():
@@ -305,7 +276,6 @@ def main():
 
 
 if __name__ == '__main__':
-    # for i in range(len(Degrees)):
     for i in Departments:
         departments_with_studs[i] = 0
     main()
