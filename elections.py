@@ -1,12 +1,20 @@
 from xlrd import open_workbook
 import xlsxwriter
 
-MASTERS_GIVAT_RAM = 111
+ADVANCED_GIVAT_RAM_NEW_DEPARTMENT = 111  # a number to put givat ram's masters under, should be different
+# then all other departments numbers
+
+# all degrees by order
 Degrees = [None, 'בוגר', 'תעודה', 'השלמה למוסמך', 'מוסמך', 'ד"ר לפילוסופיה', 'ד"ר לרפואה',
            'ד"ר לרפואת שיניים', 'מכינה', 'לא לתואר', 'ד"ר לוטרינריה', 'ד"ר רוקחות קלינית', 'השלמה למחקר']
+degs_not_advanced = [1, 2, 9]  # not advanced degrees (by index)
+
+# all faculties by order
 Faculties = [None, 'רוח', 'טבע', 'משפטים', 'רפואה', 'רפואת שיניים', 'מנהל עסקים', 'חברה', 'חקלאות', 'עו"ס',
              None, 'מדעי המוח', 'הנדסה ומדעי המחשב', 'רוקחות', 'ריפוי בעיסוק', 'סיעוד', 'מכינה',
              'תלמידי חו"ל', 'מדעי הרפואה']
+
+# all departments by index and name
 Departments = {860: 'מכינה מסלול מדעי הטבע והחיים מוגבר',
                820: 'מכינה מסלול מדעי הטבע והחיים',
                830: 'מכינה מסלול מדעים מדוייקים והנדסה',
@@ -208,19 +216,39 @@ Departments = {860: 'מכינה מסלול מדעי הטבע והחיים מוג
                597: 'מדעי המוח- חישוב ועיבוד מידע',
                992: 'האקדמיה למוזיקה (מוסמך)',
                0: 'Unknown',
-               MASTERS_GIVAT_RAM: 'תארים מתקדמים גבעת רם כללי'
+               ADVANCED_GIVAT_RAM_NEW_DEPARTMENT: 'תארים מתקדמים גבעת רם כללי'
                }
-givat_ram_not_masters = [899, 521, 523, 586, 587, 890, 583, 581, 530, 541, 569, 555, 560, 545, 591, 595,
-                         599, 589, 590, 592, 596, 318, 588, 580, 532, 570, 566, 579, 575, 577, 573, 576,
-                         582]
-not_masters = [1, 2, 9]
+# departments in givat ram
+givat_ram_deps = [899, 521, 523, 586, 587, 890, 583, 581, 530, 541, 569, 555, 560, 545, 591, 595,
+                  599, 589, 590, 592, 596, 318, 588, 580, 532, 570, 566, 579, 575, 577, 573, 576,
+                  582, 572, 597, 511, 880]
+givat_ram_advanced = [511, 880]  # advanced degrees departments in givat ram
 
 departments_with_studs = dict()
 
-wb = open_workbook('aguda2021.xls')
+
+def add_stud_dept(deg, dept, num):
+    """
+    Adds a student to the department.
+     Checks if the student is in advanced degrees in givat ram or not (if s/he is, adds to advanced degrees
+     as should be in givat ram).
+    Adds the number specified in num.
+    """
+    if dept in givat_ram_deps and deg not in degs_not_advanced:
+        if dept not in givat_ram_advanced:  # this is already advanced and need not be moved to the new dept
+            dept = ADVANCED_GIVAT_RAM_NEW_DEPARTMENT
+    try:
+        departments_with_studs[dept] += num
+    except KeyError:
+        departments_with_studs[dept] = num
 
 
-def deal_with_row(fac, deg, dept1, dept2):
+def deal_with_row(fac, deg, dept1, dept2, dept3):
+    """
+    If the students has two departments, it will count as half to each one of them. If it has only one,
+    it will count as full one to it.
+    Unused parameters are for if they will be wanted in the future.
+    """
     if dept2 == 0:
         add_stud_dept(deg, dept1, 1)
     else:
@@ -228,17 +256,28 @@ def deal_with_row(fac, deg, dept1, dept2):
         add_stud_dept(deg, dept2, 0.5)
 
 
-def add_stud_dept(deg, dept1, num):
-    if dept1 in givat_ram_not_masters and deg not in not_masters:
-        dept1 = MASTERS_GIVAT_RAM
-    try:
-        departments_with_studs[dept1] += num
-    except KeyError:
-        departments_with_studs[dept1] = num
+def read_xls_file():
+    wb = open_workbook('aguda2021.xls')  # file should be in same directory and have this exact name
+    # columns should be in this order, with header column: faculty, degree, department, department
+    for sheet in wb.sheets():
+        number_of_rows = sheet.nrows
+        number_of_columns = sheet.ncols
+
+        for row in range(1, number_of_rows):
+            values = []
+            for col in range(number_of_columns):
+                value = sheet.cell(row, col).value
+                try:
+                    value = int(value)
+                except ValueError:
+                    value = 0
+                finally:
+                    values.append(value)
+            deal_with_row(values[0], values[1], values[2], values[3], values[4])
 
 
-def write_results_dept():
-    workbook = xlsxwriter.Workbook('Elections2.xlsx')
+def write_results():
+    workbook = xlsxwriter.Workbook('Elections.xlsx')
     worksheet = workbook.add_worksheet("Results")
 
     worksheet.write(0, 0, 'חוג')
@@ -256,26 +295,8 @@ def write_results_dept():
     workbook.close()
 
 
-def main():
-    for sheet in wb.sheets():
-        number_of_rows = sheet.nrows
-        number_of_columns = sheet.ncols
-
-        for row in range(1, number_of_rows):
-            values = []
-            for col in range(number_of_columns):
-                value = sheet.cell(row, col).value
-                try:
-                    value = int(value)
-                except ValueError:
-                    value = 0
-                finally:
-                    values.append(value)
-            deal_with_row(values[0], values[1], values[2], values[3])
-    write_results_dept()
-
-
 if __name__ == '__main__':
     for i in Departments:
         departments_with_studs[i] = 0
-    main()
+    read_xls_file()
+    write_results()
