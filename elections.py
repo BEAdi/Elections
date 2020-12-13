@@ -212,8 +212,6 @@ Departments = {860: 'מכינה מסלול מדעי הטבע והחיים מוג
                794: 'בעלי חיים וביוטכנולוגיה בחקלאות',
                793: 'ביוכימיה ומדעי המזון וביוטכנולוגיה בחקלאות',
                991: 'האקדמיה למוזיקה',
-               572: 'מדעי הצמח',
-               597: 'מדעי המוח- חישוב ועיבוד מידע',
                992: 'האקדמיה למוזיקה (מוסמך)',
                0: 'Unknown',
                ADVANCED_GIVAT_RAM_NEW_DEPARTMENT: 'תארים מתקדמים גבעת רם כללי'
@@ -222,7 +220,7 @@ Departments = {860: 'מכינה מסלול מדעי הטבע והחיים מוג
 givat_ram_deps = [899, 521, 523, 586, 587, 890, 583, 581, 530, 541, 569, 555, 560, 545, 591, 595,
                   599, 589, 590, 592, 596, 318, 588, 580, 532, 570, 566, 579, 575, 577, 573, 576,
                   582, 572, 597, 511, 880]
-givat_ram_advanced = [511, 880]  # advanced degrees departments in givat ram
+givat_ram_advanced = [511, 880, 582]  # advanced degrees departments in givat ram
 
 departments_with_studs = dict()
 
@@ -239,7 +237,7 @@ def add_stud_dept(deg, dept, num):
             dept = ADVANCED_GIVAT_RAM_NEW_DEPARTMENT
     try:
         departments_with_studs[dept] += num
-    except KeyError:
+    except KeyError:  # should not happen as it is zeroed at first, but remained for future changes
         departments_with_studs[dept] = num
 
 
