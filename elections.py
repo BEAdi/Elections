@@ -255,7 +255,7 @@ def deal_with_row(fac, deg, dept1, dept2, dept3):
 
 
 def read_xls_file():
-    wb = open_workbook('aguda2021.xls')  # file should be in same directory and have this exact name
+    wb = open_workbook('aguda.xls')  # file should be in same directory and have this exact name
     # columns should be in this order, with header column: faculty, degree, department, department
     for sheet in wb.sheets():
         number_of_rows = sheet.nrows
