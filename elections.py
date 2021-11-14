@@ -240,6 +240,7 @@ def add_stud_dept(deg, dept, num):
         departments_with_studs[dept] += num
     except KeyError:  # should not happen as it is zeroed at first, but remained for future changes
         departments_with_studs[dept] = num
+        print(f'got key error with department {dept}')
 
 
 def deal_with_row(fac, deg, dept1, dept2, dept3):
@@ -291,9 +292,13 @@ def write_results():
     col = 0
 
     for elem in departments_with_studs:
-        worksheet.write(row, col, Departments[elem])  # department
-        worksheet.write(row, col + 1, elem)  # department num
-        worksheet.write(row, col + 2, departments_with_studs[elem])  # num of studs
+        try:
+            worksheet.write(row, col, Departments[elem])  # department
+            worksheet.write(row, col + 1, elem)  # department num
+            worksheet.write(row, col + 2, departments_with_studs[elem])  # num of studs
+        except KeyError:
+            print(f'got key error with department {elem} that has {departments_with_studs[elem]} students,'
+                  f' moving to next department')
         row += 1
     workbook.close()
 
