@@ -8,6 +8,7 @@ ADVANCED_GIVAT_RAM_NEW_DEPARTMENT = 111  # a number to put givat ram's masters u
 Degrees = [None, 'בוגר', 'תעודה', 'השלמה למוסמך', 'מוסמך', 'ד"ר לפילוסופיה', 'ד"ר לרפואה',
            'ד"ר לרפואת שיניים', 'מכינה', 'לא לתואר', 'ד"ר לוטרינריה', 'ד"ר רוקחות קלינית', 'השלמה למחקר']
 degs_not_advanced = [1, 2, 9]  # not advanced degrees (by index)
+degs_to_ignore = [2, 3, 9]  # are not counted for mandates
 
 # all faculties by order
 Faculties = [None, 'רוח', 'טבע', 'משפטים', 'רפואה', 'רפואת שיניים', 'מנהל עסקים', 'חברה', 'חקלאות', 'עו"ס',
@@ -245,8 +246,12 @@ def deal_with_row(fac, deg, dept1, dept2, dept3):
     """
     If the students has two departments, it will count as half to each one of them. If it has only one,
     it will count as full one to it.
+     Checks if the student learns for one of the degrees that are not counted for mandates, and if so does
+     not add him/her.
     Unused parameters are for if they will be wanted in the future.
     """
+    if deg in degs_to_ignore:
+        return
     if dept2 == 0:
         add_stud_dept(deg, dept1, 1)
     else:
